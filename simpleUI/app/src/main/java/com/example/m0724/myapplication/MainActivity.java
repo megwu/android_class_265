@@ -8,6 +8,7 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
@@ -17,8 +18,8 @@ public class MainActivity extends AppCompatActivity {
     EditText editText;
     RadioGroup radioGroup;
     String sex = "";
-    String selectedSex = "Male";
-    String name = "";
+    String drinkName = "black tea";
+    String note = "";
     CheckBox checkBox;
 
     @Override
@@ -61,14 +62,17 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
-                if (checkedId == R.id.maleRadioButton) {
-                    selectedSex = "Male";
-                } else if (checkedId == R.id.femaleRadioButton) {
-                    selectedSex = "Female";
-                }
+//                if (checkedId == R.id.maleRadioButton) {
+//                    selectedSex = "Male";
+//                } else if (checkedId == R.id.femaleRadioButton) {
+//                    selectedSex = "Female";
+//                }
+                RadioButton radioButton = (RadioButton)findViewById(checkedId);
+                drinkName = radioButton.getText().toString();
             }
         });
 
+        /*
         // CheckBox Change
         checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
 
@@ -86,19 +90,23 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+        */
     }
 
     public void click(View view) { //建立function 若要Import就按Alt + Enter ,然後再button的onClick下拉選單可以選到此function
         //textView.setText("Android Class"); //程式碼設定顯示的文字
 
-        name = editText.getText().toString(); //取得畫面上輸入的文字
-        sex = selectedSex;
+        note = editText.getText().toString(); //取得畫面上輸入的文字
+        sex = drinkName;
 //        String text = name + ", sex:" + sex;
 //        textView.setText(text); //將輸入的文字set到TextView
-        changeTextView(); //將上面兩行註解 改成changeTextView();
+//        changeTextView(); //將上面兩行註解 改成changeTextView();
+        String text = note;
+        textView.setText(text);
         editText.setText(""); //將editText清空
     }
 
+    /*
     // 檢查是 hide CheckBox
     public void changeTextView() {
         if (checkBox.isChecked()) {
@@ -109,5 +117,6 @@ public class MainActivity extends AppCompatActivity {
             textView.setText(text);
         }
     }
+    */
 
 }
