@@ -12,6 +12,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -28,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
 //    ArrayList<String> orders;
     ArrayList<Order> orders;
     ListView listView;
+    Spinner spinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
         checkBox = (CheckBox)findViewById(R.id.hideCheckBox);
         listView = (ListView)findViewById(R.id.listView);
         orders = new ArrayList<>();
+        spinner = (Spinner)findViewById(R.id.spinner);
 
         // 實體鍵盤的 Enter 等同於 click 效果
         editText.setOnKeyListener(new View.OnKeyListener() {
@@ -100,6 +103,9 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         */
+
+        setupListView();
+        setupSpinner();
     }
 
     // Adapter 是轉換器
@@ -108,6 +114,13 @@ public class MainActivity extends AppCompatActivity {
 //        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, orders);
         OrderAdapter adapter = new OrderAdapter(this, orders); //自建物件
         listView.setAdapter(adapter); //把東西丟進去
+    }
+
+    void setupSpinner() {
+        String[] data = getResources().getStringArray(R.array.storeInfo);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, data);
+
+        spinner.setAdapter(adapter);
     }
 
     public void click(View view) { //建立function 若要Import就按Alt + Enter ,然後再button的onClick下拉選單可以選到此function
@@ -125,12 +138,14 @@ public class MainActivity extends AppCompatActivity {
         Order order = new Order();
         order.drinkName = drinkName;
         order.note = note;
+        order.storeInfo = (String)spinner.getSelectedItem(); //取得下拉選單的值
 
         orders.add(order);
 
         editText.setText(""); //將editText清空
 
         setupListView();
+        setupSpinner();
     }
 
     /*

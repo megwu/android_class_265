@@ -8,10 +8,10 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.zip.Inflater;
 
 /**
  * Created by m0724 on 2016/4/25.
+ * 資料轉換器
  */
 public class OrderAdapter extends BaseAdapter {
     ArrayList<Order> orders;
@@ -48,6 +48,7 @@ public class OrderAdapter extends BaseAdapter {
 
             holder.drinkName = (TextView) convertView.findViewById(R.id.drinkName);
             holder.note = (TextView) convertView.findViewById(R.id.note);
+            holder.storeInfo = (TextView )convertView.findViewById(R.id.store);
 
             convertView.setTag(holder); //holder 放到converView的其中一個空間裡面去
         } else {
@@ -62,6 +63,7 @@ public class OrderAdapter extends BaseAdapter {
 
         holder.drinkName.setText(orders.get(position).drinkName);
         holder.note.setText(orders.get(position).note);
+        holder.storeInfo.setText(orders.get(position).storeInfo);
 
         return convertView;
     }
@@ -70,5 +72,6 @@ public class OrderAdapter extends BaseAdapter {
     class Holder {
         TextView drinkName;
         TextView note;
+        TextView storeInfo;
     }
 }
