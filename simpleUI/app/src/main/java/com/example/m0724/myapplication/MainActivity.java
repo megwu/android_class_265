@@ -5,12 +5,16 @@ import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -21,6 +25,9 @@ public class MainActivity extends AppCompatActivity {
     String drinkName = "black tea";
     String note = "";
     CheckBox checkBox;
+//    ArrayList<String> orders;
+    ArrayList<Order> orders;
+    ListView listView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +38,8 @@ public class MainActivity extends AppCompatActivity {
         editText = (EditText) findViewById(R.id.editText);
         radioGroup = (RadioGroup) findViewById(R.id.radioGroup);
         checkBox = (CheckBox)findViewById(R.id.hideCheckBox);
+        listView = (ListView)findViewById(R.id.listView);
+        orders = new ArrayList<>();
 
         // 實體鍵盤的 Enter 等同於 click 效果
         editText.setOnKeyListener(new View.OnKeyListener() {
@@ -93,17 +102,35 @@ public class MainActivity extends AppCompatActivity {
         */
     }
 
+    // Adapter 是轉換器
+    void setupListView() {
+        // Ctrl + 滑鼠左鍵 點 ArrayAdapter 可以看到許多方法
+//        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, orders);
+        OrderAdapter adapter = new OrderAdapter(this, orders); //自建物件
+        listView.setAdapter(adapter); //把東西丟進去
+    }
+
     public void click(View view) { //建立function 若要Import就按Alt + Enter ,然後再button的onClick下拉選單可以選到此function
         //textView.setText("Android Class"); //程式碼設定顯示的文字
 
         note = editText.getText().toString(); //取得畫面上輸入的文字
-        sex = drinkName;
+//        sex = drinkName;
 //        String text = name + ", sex:" + sex;
 //        textView.setText(text); //將輸入的文字set到TextView
 //        changeTextView(); //將上面兩行註解 改成changeTextView();
         String text = note;
         textView.setText(text);
+//        orders.add(text);
+
+        Order order = new Order();
+        order.drinkName = drinkName;
+        order.note = note;
+
+        orders.add(order);
+
         editText.setText(""); //將editText清空
+
+        setupListView();
     }
 
     /*
