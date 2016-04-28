@@ -1,10 +1,12 @@
 package com.example.m0724.myapplication;
 
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -14,6 +16,7 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -103,6 +106,19 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         */
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() { // new 選第一個按Enter 程式會自己長出來
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Order order = (Order) parent.getAdapter().getItem(position); // parent.getAdapter() 回傳的型態是T , T 是當初我們設的型態就是甚麼型態
+
+                // 這裡不能直接.this是因為是包在function中,所以要呼叫外部this就要用class名稱.this = MainActivity.this
+//                Toast.makeText(MainActivity.this, order.note, Toast.LENGTH_LONG).show(); // 吐司，是下載框框，可以上網查來源，老師說很有趣
+                // 另外的顯示框框,顯示速度比土司還要快,點即可以在寫function比土司多一層設計 google會選擇用這個取代掉土司
+//                Snackbar.make(view, order.note, Snackbar.LENGTH_LONG).show();
+                // .setAction() 可以自己玩玩看
+//                Snackbar.make(view, order.note, Snackbar.LENGTH_LONG).setAction().show();
+            }
+        });
 
         setupListView();
         setupSpinner();
