@@ -1,5 +1,8 @@
 package com.example.m0724.myapplication;
 
+import android.app.backup.SharedPreferencesBackupHelper;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -34,6 +37,10 @@ public class MainActivity extends AppCompatActivity {
     ListView listView;
     Spinner spinner;
 
+    // 寫入記憶體 有上限 (記簡單少量的資訊,不要存大量的資料 ex:ListView)
+    SharedPreferences sp;
+    SharedPreferences.Editor editor;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,11 +54,27 @@ public class MainActivity extends AppCompatActivity {
         orders = new ArrayList<>();
         spinner = (Spinner)findViewById(R.id.spinner);
 
+        // 第一個字串 setting 是哪一本字典, 拿setting的這一本字典; Context.MODE_PRIVATE
+        sp = getSharedPreferences("setting", Context.MODE_PRIVATE);
+        editor = sp.edit(); // 拿出這一本字典的筆給你,就可以寫字典的內容
+        // 讀檔案
+//        textView.setText(Utils.readFile(this, "notes"));
+        // 讀檔案 - 字串處理 (不work@@)
+//        String[] data = Utils.readFile(this, "notes").split("\n");
+//        textView.setText(data[0]);
+
+        // (sp.getString("editText", "") 是假設找不到"editText"這個key值，第二個字串就是預設值
+                editText.setText(sp.getString("editText", ""));
+
         // 實體鍵盤的 Enter 等同於 click 效果
         editText.setOnKeyListener(new View.OnKeyListener() {
 
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
+                String text = editText.getText().toString();
+                editor.putString("editText", text);
+                editor.apply(); //要寫這一句才會寫入記憶體
+
                 if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN) {
                     click(v);
                     return true;
@@ -72,17 +95,24 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // 第二參數不能給0,是要給layout上面物件的id
+        radioGroup.check(sp.getInt("radioGroup", R.id.blackTeaRadioButton));
+
         // RadioButton Change
-        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener(){
+        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
 
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
+                // 寫入字典裡面
+                editor.putInt("radioGroup", checkedId);
+                editor.apply();
+
 //                if (checkedId == R.id.maleRadioButton) {
 //                    selectedSex = "Male";
 //                } else if (checkedId == R.id.femaleRadioButton) {
 //                    selectedSex = "Female";
 //                }
-                RadioButton radioButton = (RadioButton)findViewById(checkedId);
+                RadioButton radioButton = (RadioButton) findViewById(checkedId);
                 drinkName = radioButton.getText().toString();
             }
         });
@@ -122,6 +152,7 @@ public class MainActivity extends AppCompatActivity {
 
         setupListView();
         setupSpinner();
+
     }
 
     // Adapter 是轉換器
@@ -157,6 +188,8 @@ public class MainActivity extends AppCompatActivity {
         order.storeInfo = (String)spinner.getSelectedItem(); //取得下拉選單的值
 
         orders.add(order);
+
+//        Utils.writeFile(this, "notes", order.note + "\n"); // \n是空行
 
         editText.setText(""); //將editText清空
 
