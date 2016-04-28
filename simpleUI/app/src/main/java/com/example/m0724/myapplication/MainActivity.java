@@ -22,6 +22,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.List;
+
+import io.realm.Realm;
+import io.realm.RealmConfiguration;
+import io.realm.RealmResults;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -29,17 +34,20 @@ public class MainActivity extends AppCompatActivity {
     EditText editText;
     RadioGroup radioGroup;
     String sex = "";
-    String drinkName = "black tea";
+//    String drinkName = "black tea";
+    String drinkName;
     String note = "";
     CheckBox checkBox;
 //    ArrayList<String> orders;
-    ArrayList<Order> orders;
+    List<Order> orders;
     ListView listView;
     Spinner spinner;
 
     // 寫入記憶體 有上限 (記簡單少量的資訊,不要存大量的資料 ex:ListView)
     SharedPreferences sp;
     SharedPreferences.Editor editor;
+
+    Realm realm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,8 +71,13 @@ public class MainActivity extends AppCompatActivity {
 //        String[] data = Utils.readFile(this, "notes").split("\n");
 //        textView.setText(data[0]);
 
+        // Create a RealmConfiguration which is to locate Realm file in package's "files" directory.
+        RealmConfiguration realmConfig = new RealmConfiguration.Builder(this).build();
+        // Get a Realm instance for this thread
+        realm = Realm.getInstance(realmConfig);
+
         // (sp.getString("editText", "") 是假設找不到"editText"這個key值，第二個字串就是預設值
-                editText.setText(sp.getString("editText", ""));
+        editText.setText(sp.getString("editText", ""));
 
         // 實體鍵盤的 Enter 等同於 click 效果
         editText.setOnKeyListener(new View.OnKeyListener() {
@@ -96,7 +109,11 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // 第二參數不能給0,是要給layout上面物件的id
-        radioGroup.check(sp.getInt("radioGroup", R.id.blackTeaRadioButton));
+        int checkedId = sp.getInt("radioGroup", R.id.blackTeaRadioButton);
+        radioGroup.check(checkedId);
+
+        RadioButton radioButton = (RadioButton) findViewById(checkedId);
+        drinkName = radioButton.getText().toString();
 
         // RadioButton Change
         radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
@@ -159,7 +176,12 @@ public class MainActivity extends AppCompatActivity {
     void setupListView() {
         // Ctrl + 滑鼠左鍵 點 ArrayAdapter 可以看到許多方法
 //        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, orders);
-        OrderAdapter adapter = new OrderAdapter(this, orders); //自建物件
+//        OrderAdapter adapter = new OrderAdapter(this, orders); //自建物件
+//        listView.setAdapter(adapter); //把東西丟進去
+
+        RealmResults results = realm.allObjects(Order.class); // 要所有的訂單
+        // 用RealmResults接,可以再用results做很多事情,例如filter, sort ...
+        OrderAdapter adapter = new OrderAdapter(this, results.subList(0, results.size()));
         listView.setAdapter(adapter); //把東西丟進去
     }
 
@@ -183,11 +205,21 @@ public class MainActivity extends AppCompatActivity {
 //        orders.add(text);
 
         Order order = new Order();
-        order.drinkName = drinkName;
-        order.note = note;
-        order.storeInfo = (String)spinner.getSelectedItem(); //取得下拉選單的值
+//        order.drinkName = drinkName;
+//        order.note = note;
+//        order.storeInfo = (String)spinner.getSelectedItem(); //取得下拉選單的值
+        // Order物件有做get和set,所以將上面改成以下寫法
+        order.setDrinkName(drinkName);
+        order.setNote(note);
+        order.setStoreInfo((String) spinner.getSelectedItem());
 
-        orders.add(order);
+
+        // Persist your data easily
+        realm.beginTransaction();
+        realm.copyToRealm(order);
+        realm.commitTransaction();
+
+//        orders.add(order);
 
 //        Utils.writeFile(this, "notes", order.note + "\n"); // \n是空行
 

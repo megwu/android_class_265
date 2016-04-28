@@ -8,16 +8,17 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by m0724 on 2016/4/25.
  * 資料轉換器
  */
 public class OrderAdapter extends BaseAdapter {
-    ArrayList<Order> orders;
+    List<Order> orders;
     LayoutInflater inflater; //自動作縮小放大的動作
 
-    public OrderAdapter(Context context, ArrayList<Order> orders) {
+    public OrderAdapter(Context context, List<Order> orders) {
         this.inflater = LayoutInflater.from(context);
         this.orders = orders;
     }
@@ -61,9 +62,9 @@ public class OrderAdapter extends BaseAdapter {
 //        drinkName.setText(orders.get(position).drinkName);
 //        note.setText(orders.get(position).note);
 
-        holder.drinkName.setText(orders.get(position).drinkName);
-        holder.note.setText(orders.get(position).note);
-        holder.storeInfo.setText(orders.get(position).storeInfo);
+        holder.drinkName.setText(orders.get(position).getDrinkName());
+        holder.note.setText(orders.get(position).getNote());
+        holder.storeInfo.setText(orders.get(position).getStoreInfo());
 
         return convertView;
     }
