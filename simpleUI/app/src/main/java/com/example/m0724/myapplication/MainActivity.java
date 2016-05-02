@@ -1,10 +1,8 @@
 package com.example.m0724.myapplication;
 
-import android.app.backup.SharedPreferencesBackupHelper;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -14,14 +12,11 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +26,8 @@ import io.realm.RealmConfiguration;
 import io.realm.RealmResults;
 
 public class MainActivity extends AppCompatActivity {
+
+    private static final int REQUEST_CODE_MENU_ACTIVITY = 0;
 
     TextView textView; //宣告 變數型態 變數名稱
     EditText editText;
@@ -44,6 +41,8 @@ public class MainActivity extends AppCompatActivity {
     List<Order> orders;
     ListView listView;
     Spinner spinner;
+
+    String menuResults = "";
 
     // 寫入記憶體 有上限 (記簡單少量的資訊,不要存大量的資料 ex:ListView)
     SharedPreferences sp;
@@ -74,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
 //        textView.setText(data[0]);
 
         // Create a RealmConfiguration which is to locate Realm file in package's "files" directory.
-        RealmConfiguration realmConfig = new RealmConfiguration.Builder(this).build();
+        RealmConfiguration realmConfig = new RealmConfiguration.Builder(this).deleteRealmIfMigrationNeeded().build();
         // Get a Realm instance for this thread
         realm = Realm.getInstance(realmConfig);
 
@@ -174,7 +173,7 @@ public class MainActivity extends AppCompatActivity {
         setupSpinner();
 
 
-        int selectedId = sp.getInt("spinner", R.id.spinner);
+        int selectedId = sp.getInt("spinner", 0);
         spinner.setSelection(selectedId);
 
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -230,7 +229,7 @@ public class MainActivity extends AppCompatActivity {
 //        order.note = note;
 //        order.storeInfo = (String)spinner.getSelectedItem(); //取得下拉選單的值
         // Order物件有做get和set,所以將上面改成以下寫法
-        order.setDrinkName(drinkName);
+        order.setMenuResults(menuResults);
         order.setNote(note);
         order.setStoreInfo((String) spinner.getSelectedItem());
 
@@ -245,6 +244,8 @@ public class MainActivity extends AppCompatActivity {
 //        Utils.writeFile(this, "notes", order.note + "\n"); // \n是空行
 
         editText.setText(""); //將editText清空
+
+        menuResults = "";
 
         setupListView();
 //        setupSpinner();
@@ -268,7 +269,19 @@ public class MainActivity extends AppCompatActivity {
 
         intent.setClass(this, DrinkMenuActivity.class); // 從這裡呼叫DrinkMenuActivity
 
-        startActivity(intent); //呼叫
+//        startActivity(intent); //呼叫
+        startActivityForResult(intent, REQUEST_CODE_MENU_ACTIVITY); //呼叫並能辨別是哪個 Actitvity 回傳回來的 (requestCode)
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == REQUEST_CODE_MENU_ACTIVITY) {
+            if (resultCode == RESULT_OK) {
+                menuResults = data.getStringExtra("result");
+            }
+        }
     }
 
     @Override

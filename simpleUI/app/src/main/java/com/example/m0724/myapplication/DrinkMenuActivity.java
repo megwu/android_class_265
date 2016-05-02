@@ -1,5 +1,6 @@
 package com.example.m0724.myapplication;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -38,7 +39,13 @@ public class DrinkMenuActivity extends AppCompatActivity {
     }
 
     public void done(View view) {
+        Intent intent = new Intent();
+        intent.putExtra("result", getData().toString()); // put 只接受常見的型態 例如String, int, boolean...，所以把JSONArray轉成toString
 
+        // 把界值留在這邊 (resultCode = RESULT_OK)
+        setResult(RESULT_OK, intent);
+        // 把自己結束掉
+        finish();
     }
 
     public JSONArray getData() {
