@@ -17,6 +17,11 @@ import android.widget.ListView;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.SaveCallback;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,6 +60,34 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Log.d("debug", "Main Activity OnCreate");
+
+        ParseObject testObject = new ParseObject("TestObject"); //Class名稱
+        testObject.put("test", "456"); //創造欄位(不太能打純數字)和欄位的值
+        testObject.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if (e != null) {
+                    Toast.makeText(MainActivity.this, e.toString(), Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(MainActivity.this, "save success", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+        /*Homework
+        ParseObject testObject = new ParseObject("HomeworkParse"); //Class名稱
+        testObject.put("sid", "吳曉佩"); //創造欄位(不太能打純數字)和欄位的值
+        testObject.put("email", "m07240629@gmail.com");
+        testObject.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if (e != null) {
+                    Toast.makeText(MainActivity.this, e.toString(), Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(MainActivity.this, "save success", Toast.LENGTH_LONG).show();
+                }
+            }
+        });*/
+
         textView = (TextView) findViewById(R.id.textView); //byId找View物件,View是高級的型態,所以要轉型成TextView
         editText = (EditText) findViewById(R.id.editText);
         radioGroup = (RadioGroup) findViewById(R.id.radioGroup);
