@@ -14,6 +14,7 @@ import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -48,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
     List<Order> orders;
     ListView listView;
     Spinner spinner;
+    ProgressBar progressBar;
 
     String menuResults = "";
 
@@ -97,6 +99,7 @@ public class MainActivity extends AppCompatActivity {
         listView = (ListView)findViewById(R.id.listView);
         orders = new ArrayList<>();
         spinner = (Spinner)findViewById(R.id.spinner);
+        progressBar = (ProgressBar)findViewById(R.id.progressBar);
 
         // 第一個字串 setting 是哪一本字典, 拿setting的這一本字典; Context.MODE_PRIVATE
         sp = getSharedPreferences("setting", Context.MODE_PRIVATE);
@@ -240,6 +243,8 @@ public class MainActivity extends AppCompatActivity {
 //        OrderAdapter adapter = new OrderAdapter(this, results.subList(0, results.size()));
 //        listView.setAdapter(adapter); //把東西丟進去
 
+        progressBar.setVisibility(View.VISIBLE); // 讓轉轉轉看的見
+
         final RealmResults results = realm.allObjects(Order.class); // 要所有的訂單
         // 用RealmResults接,可以再用results做很多事情,例如filter, sort ...
         OrderAdapter adapter = new OrderAdapter(MainActivity.this, results.subList(0, results.size()));
@@ -252,6 +257,9 @@ public class MainActivity extends AppCompatActivity {
             public void done(List<ParseObject> objects, ParseException e) {
                 if (e != null) {
                     Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
+
+                    progressBar.setVisibility(View.GONE); // 讓轉轉轉看不見
+
                     return;
                 }
                 List<Order> orders = new ArrayList<Order>();
@@ -275,6 +283,8 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 realm.close();
+
+                progressBar.setVisibility(View.GONE); // 讓轉轉轉看不見
 
                 OrderAdapter adapter = new OrderAdapter(MainActivity.this, orders);
                 listView.setAdapter(adapter);
