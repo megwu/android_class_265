@@ -18,6 +18,7 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -204,6 +205,17 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         */
+        checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    photoImageView.setVisibility(View.GONE);
+                } else {
+                    photoImageView.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() { // new 選第一個按Enter 程式會自己長出來
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
