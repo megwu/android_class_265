@@ -240,6 +240,11 @@ public class MainActivity extends AppCompatActivity {
 //        OrderAdapter adapter = new OrderAdapter(this, results.subList(0, results.size()));
 //        listView.setAdapter(adapter); //把東西丟進去
 
+        final RealmResults results = realm.allObjects(Order.class); // 要所有的訂單
+        // 用RealmResults接,可以再用results做很多事情,例如filter, sort ...
+        OrderAdapter adapter = new OrderAdapter(MainActivity.this, results.subList(0, results.size()));
+        listView.setAdapter(adapter); //把東西丟進去
+
         //改用網路上抓資料下來
         ParseQuery<ParseObject> query = new ParseQuery<ParseObject>("Order");
         query.findInBackground(new FindCallback<ParseObject>() {
@@ -247,19 +252,11 @@ public class MainActivity extends AppCompatActivity {
             public void done(List<ParseObject> objects, ParseException e) {
                 if (e != null) {
                     Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
-
-                    Realm realm = Realm.getDefaultInstance();
-
-                    RealmResults results = realm.allObjects(Order.class); // 要所有的訂單
-                    // 用RealmResults接,可以再用results做很多事情,例如filter, sort ...
-                    OrderAdapter adapter = new OrderAdapter(MainActivity.this, results.subList(0, results.size()));
-                    listView.setAdapter(adapter); //把東西丟進去
-
-                    realm.close();
-
                     return;
                 }
                 List<Order> orders = new ArrayList<Order>();
+
+                Realm realm = Realm.getDefaultInstance();
 
                 for (int i = 0; i < objects.size(); i++) {
                     Order order = new Order();
@@ -267,7 +264,17 @@ public class MainActivity extends AppCompatActivity {
                     order.setStoreInfo(objects.get(i).getString("storeInfo"));
                     order.setMenuResults(objects.get(i).getString("menuResults"));
                     orders.add(order);
+
+                    // 表示網路上的資料數 > local端的資料數
+                    if (results.size() <= i) {
+                        // 加到local端的realm
+                        realm.beginTransaction();
+                        realm.copyToRealm(order);
+                        realm.commitTransaction();
+                    }
                 }
+
+                realm.close();
 
                 OrderAdapter adapter = new OrderAdapter(MainActivity.this, orders);
                 listView.setAdapter(adapter);
