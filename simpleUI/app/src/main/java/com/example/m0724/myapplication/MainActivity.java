@@ -318,10 +318,35 @@ public class MainActivity extends AppCompatActivity {
     }
 
     void setupSpinner() {
-        String[] data = getResources().getStringArray(R.array.storeInfo);
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, data);
+//        String[] data = getResources().getStringArray(R.array.storeInfo);
+//        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, data);
+//
+//        spinner.setAdapter(adapter);
 
-        spinner.setAdapter(adapter);
+        //改用網路上抓資料下來
+        ParseQuery<ParseObject> query = new ParseQuery<ParseObject>("StoreInfo");
+        query.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> objects, ParseException e) {
+                if (e != null) {
+                    Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
+
+                    return;
+                }
+
+                Realm realm = Realm.getDefaultInstance();
+                ArrayList dataList = new ArrayList();
+
+                for (int i = 0; i < objects.size(); i++) {
+                    dataList.add(objects.get(i).getString("name"));
+                }
+
+                realm.close();
+
+                ArrayAdapter<String> adapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_spinner_dropdown_item, dataList);
+                spinner.setAdapter(adapter);
+            }
+        });
 
     }
 
