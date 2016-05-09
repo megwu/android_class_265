@@ -1,8 +1,12 @@
 package com.example.m0724.myapplication;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.os.Build;
+import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -15,6 +19,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RadioGroup;
@@ -38,6 +43,7 @@ import io.realm.RealmResults;
 public class MainActivity extends AppCompatActivity {
 
     private static final int REQUEST_CODE_MENU_ACTIVITY = 0;
+    private static final int REQUEST_CODE_CAMERA_ACTIVITY = 1;
 
     TextView textView; //宣告 變數型態 變數名稱
     EditText editText;
@@ -52,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
     ListView listView;
     Spinner spinner;
     ProgressBar progressBar;
+    ImageView photoImageView;
 
     String menuResults = "";
 
@@ -102,6 +109,7 @@ public class MainActivity extends AppCompatActivity {
         orders = new ArrayList<>();
         spinner = (Spinner)findViewById(R.id.spinner);
         progressBar = (ProgressBar)findViewById(R.id.progressBar);
+        photoImageView = (ImageView)findViewById(R.id.imageView);
 
         // 第一個字串 setting 是哪一本字典, 拿setting的這一本字典; Context.MODE_PRIVATE
         sp = getSharedPreferences("setting", Context.MODE_PRIVATE);
@@ -378,6 +386,10 @@ public class MainActivity extends AppCompatActivity {
             if (resultCode == RESULT_OK) {
                 menuResults = data.getStringExtra("result");
             }
+        } else if (requestCode == REQUEST_CODE_CAMERA_ACTIVITY) { //判斷是不是從camera會來
+            if (resultCode == RESULT_OK) {
+                photoImageView.setImageURI(Utils.getPhotoURI());
+            }
         }
     }
 
@@ -392,8 +404,25 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
         if (id == R.id.action_take_photo) {
             Toast.makeText(this, "Take Photo", Toast.LENGTH_LONG).show();
+            goToCamera();
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    protected void goToCamera() {
+        // 版本若大於等於23
+        if (Build.VERSION.SDK_INT >= 23) {
+            // 確認user是否按過允許
+            if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
+                return;
+            }
+        }
+
+        Intent intent = new Intent();
+        intent.setAction(MediaStore.ACTION_IMAGE_CAPTURE); // 呼叫拍照的功能
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, Utils.getPhotoURI()); //放照片的位置
+        startActivityForResult(intent, REQUEST_CODE_CAMERA_ACTIVITY);
     }
 
     @Override

@@ -22,7 +22,7 @@
         android:id="@+id/button"
         android:enabled="true"
         android:onClick="click"
-        android:layout_below="@+id/spinner"
+        android:layout_below="@+id/imageView"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
 
@@ -64,12 +64,12 @@
     <CheckBox
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hide Sex"
+        android:text="Hide Photo"
         android:id="@+id/hideCheckBox"
         android:layout_alignBottom="@+id/button"
         android:layout_toRightOf="@+id/button2"
         android:checked="false"
-        android:enabled="false" />
+        android:enabled="true" />
 
     <ListView
         android:layout_width="match_parent"
@@ -102,5 +102,13 @@
         android:id="@+id/progressBar"
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/imageView"
+        android:layout_below="@+id/spinner"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
 
 </RelativeLayout>

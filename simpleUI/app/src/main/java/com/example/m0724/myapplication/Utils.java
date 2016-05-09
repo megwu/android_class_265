@@ -1,11 +1,15 @@
 package com.example.m0724.myapplication;
 
 import android.content.Context;
+import android.net.Uri;
+import android.os.Environment;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URI;
 
 /**
  * Created by user on 2016/4/28.
@@ -40,5 +44,17 @@ public class Utils {
         }
         // 若IO壞掉了,可以傳空字串當回傳值
         return "";
+    }
+
+    public static Uri getPhotoURI() {
+        File dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES); //取得相片的資料夾
+        // 判斷資料夾是否存在
+        if (dir.exists() == false) {
+            // 若不存在就要建立一個
+            dir.mkdir();
+        }
+
+        File file = new File(dir, "simpleUI_photo.png"); // 放路徑(dir) 跟 檔名(simpleUI_photo.png)
+        return Uri.fromFile(file);
     }
 }
