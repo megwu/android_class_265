@@ -1,5 +1,6 @@
 package com.example.m0724.myapplication;
 
+import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.SaveCallback;
 
@@ -12,6 +13,8 @@ public class Order extends RealmObject {
     private String note;
     private String menuResults;
     private String storeInfo;
+
+    byte[] photo = null; // 因為照片已存取在stroge裡面 所以不用做get set 避免佔realm空間。給null是因為有可能沒有拍照片
 
     public String getNote() {
         return note;
@@ -43,6 +46,12 @@ public class Order extends RealmObject {
         parseObject.put("note", note);
         parseObject.put("storeInfo", storeInfo);
         parseObject.put("menuResults", menuResults);
+
+        if (photo != null) {
+            // 因為照片檔案比較大,所以要用ParseFile來存取
+            ParseFile file = new ParseFile("photo.png", photo);
+            parseObject.put("photo", file); //再將檔案放在praseObject
+        }
 
         parseObject.saveInBackground(saveCallback);
     }

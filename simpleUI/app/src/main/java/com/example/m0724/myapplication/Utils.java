@@ -4,11 +4,13 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Environment;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 
 /**
@@ -56,5 +58,27 @@ public class Utils {
 
         File file = new File(dir, "simpleUI_photo.png"); // 放路徑(dir) 跟 檔名(simpleUI_photo.png)
         return Uri.fromFile(file);
+    }
+
+    public static byte[] uriToBytes(Context context, Uri uri) {
+        try {
+            InputStream inputStream = context.getContentResolver().openInputStream(uri);
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+
+            byte[] buffer = new byte[1024];
+            int len = 0;
+            while ((len = inputStream.read(buffer)) != -1 ) {
+                byteArrayOutputStream.write(buffer);
+            }
+
+            return byteArrayOutputStream.toByteArray();
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 }
