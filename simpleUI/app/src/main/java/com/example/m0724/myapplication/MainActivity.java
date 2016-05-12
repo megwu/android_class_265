@@ -226,7 +226,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Order order = (Order) parent.getAdapter().getItem(position); // parent.getAdapter() 回傳的型態是T , T 是當初我們設的型態就是甚麼型態
-
+                goToDetailOrder(order);
                 // 這裡不能直接.this是因為是包在function中,所以要呼叫外部this就要用class名稱.this = MainActivity.this
 //                Toast.makeText(MainActivity.this, order.note, Toast.LENGTH_LONG).show(); // 吐司，是下載框框，可以上網查來源，老師說很有趣
                 // 另外的顯示框框,顯示速度比土司還要快,點即可以在寫function比土司多一層設計 google會選擇用這個取代掉土司
@@ -299,6 +299,10 @@ public class MainActivity extends AppCompatActivity {
                     order.setNote(objects.get(i).getString("note"));
                     order.setStoreInfo(objects.get(i).getString("storeInfo"));
                     order.setMenuResults(objects.get(i).getString("menuResults"));
+                    // 判斷照片是否存在
+                    if (objects.get(i).getParseFile("photo") != null) {
+                        order.photoURL = objects.get(i).getParseFile("photo").getUrl();
+                    }
                     orders.add(order);
 
                     // 表示網路上的資料數 > local端的資料數
@@ -439,6 +443,19 @@ public class MainActivity extends AppCompatActivity {
 
 //        startActivity(intent); //呼叫
         startActivityForResult(intent, REQUEST_CODE_MENU_ACTIVITY); //呼叫並能辨別是哪個 Actitvity 回傳回來的 (requestCode)
+    }
+
+    public void goToDetailOrder(Order order) {
+        Intent intent = new Intent();
+
+        intent.setClass(this, OrderDetailActivity.class);
+
+        intent.putExtra("note", order.getNote());
+        intent.putExtra("storeInfo", order.getStoreInfo());
+        intent.putExtra("menuResults", order.getMenuResults());
+        intent.putExtra("photoURL", order.photoURL);
+        startActivity(intent);
+
     }
 
     @Override

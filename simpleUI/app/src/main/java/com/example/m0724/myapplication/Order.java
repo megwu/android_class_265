@@ -15,6 +15,7 @@ public class Order extends RealmObject {
     private String storeInfo;
 
     byte[] photo = null; // 因為照片已存取在stroge裡面 所以不用做get set 避免佔realm空間。給null是因為有可能沒有拍照片
+    String photoURL = "";
 
     public String getNote() {
         return note;

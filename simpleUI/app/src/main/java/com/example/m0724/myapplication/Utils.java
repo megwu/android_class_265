@@ -11,7 +11,10 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URL;
+import java.net.URLConnection;
 
 /**
  * Created by user on 2016/4/28.
@@ -80,5 +83,28 @@ public class Utils {
         }
 
         return null;
+    }
+
+    public static byte[] urlToBytes(String urlString) {
+        try {
+            URL url = new URL(urlString);
+            URLConnection connection = url.openConnection();
+            InputStream inputStream = connection.getInputStream();
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+
+            byte[] buffer = new byte[1024];
+            int len = 0;
+            while ((len = inputStream.read(buffer)) != -1 ) {
+                byteArrayOutputStream.write(buffer, 0, len); //要給定範圍不然會load不出圖
+            }
+
+            return byteArrayOutputStream.toByteArray();
+
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return  null;
     }
 }
