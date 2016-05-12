@@ -1,6 +1,7 @@
 package com.example.m0724.myapplication;
 
 import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -62,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
     ListView listView;
     Spinner spinner;
     ProgressBar progressBar;
+    ProgressDialog progressDialog;
     ImageView photoImageView;
 
     String menuResults = "";
@@ -114,6 +116,7 @@ public class MainActivity extends AppCompatActivity {
         spinner = (Spinner)findViewById(R.id.spinner);
         progressBar = (ProgressBar)findViewById(R.id.progressBar);
         photoImageView = (ImageView)findViewById(R.id.imageView);
+        progressDialog = new ProgressDialog(this);
 
         // 第一個字串 setting 是哪一本字典, 拿setting的這一本字典; Context.MODE_PRIVATE
         sp = getSharedPreferences("setting", Context.MODE_PRIVATE);
@@ -353,6 +356,9 @@ public class MainActivity extends AppCompatActivity {
     public void click(View view) { //建立function 若要Import就按Alt + Enter ,然後再button的onClick下拉選單可以選到此function
         //textView.setText("Android Class"); //程式碼設定顯示的文字
 
+        progressDialog.setTitle("Loading...");
+        progressDialog.show();
+
         note = editText.getText().toString(); //取得畫面上輸入的文字
 //        sex = drinkName;
 //        String text = name + ", sex:" + sex;
@@ -399,6 +405,8 @@ public class MainActivity extends AppCompatActivity {
                 menuResults = "";
                 photoImageView.setImageResource(0); //將照片刪掉
                 hasPhoto = false;
+
+                progressDialog.dismiss();
 
                 setupListView();
             }
