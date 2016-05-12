@@ -53,7 +53,8 @@ public class OrderDetailActivity extends AppCompatActivity {
         if (!"".equals(url)) {
 //            Picasso.with(this).load(intent.getStringExtra("photoURL")).into(photo);
             // 將上一行Picassp mark掉,改用寫的Task試試看
-            (new ImageLoadingTask(photo)).execute(url);
+//            (new ImageLoadingTask(photo)).execute(url);
+            (new GeoCodingTask(photo)).execute("新北市汐止區大同路一段369號");
 
             // 10萬秒跑10次 測試記憶體爆掉的狀況
             /*for (int i = 0; i < 10; i++) {
@@ -73,7 +74,25 @@ public class OrderDetailActivity extends AppCompatActivity {
         }
     }
 
-    class ImageLoadingTask extends AsyncTask<String, Void, Bitmap> {
+    private static class GeoCodingTask extends AsyncTask<String, Void, Bitmap> {
+        ImageView imageView;
+        @Override
+        protected Bitmap doInBackground(String... params) {
+            String address = params[0];
+            double[] latlng = Utils.addressToLatLng(address);
+            return Utils.getStaticMap(latlng);
+        }
+
+        @Override
+        protected void onPostExecute(Bitmap bitmap) {
+            super.onPostExecute(bitmap);
+            imageView.setImageBitmap(bitmap);
+        }
+
+        public GeoCodingTask(ImageView imageView){this.imageView = imageView;}
+    }
+
+    private static class ImageLoadingTask extends AsyncTask<String, Void, Bitmap> {
         ImageView imageView;
         @Override
         protected Bitmap doInBackground(String... params) {
