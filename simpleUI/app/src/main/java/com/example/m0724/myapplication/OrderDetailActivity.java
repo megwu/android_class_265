@@ -3,6 +3,7 @@ package com.example.m0724.myapplication;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
@@ -10,16 +11,26 @@ import android.os.Bundle;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.directions.route.AbstractRouting;
+import com.directions.route.Route;
+import com.directions.route.RouteException;
+import com.directions.route.Routing;
+import com.directions.route.RoutingListener;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
 
 public class OrderDetailActivity extends AppCompatActivity {
 
@@ -116,6 +127,8 @@ public class OrderDetailActivity extends AppCompatActivity {
 
     private static class GeoCodingTask extends AsyncTask<String, Void, double[]> {
         GoogleMap googleMap;
+        private ArrayList<Polyline> polylines;
+
         @Override
         protected double[] doInBackground(String... params) {
             String address = params[0];
@@ -125,7 +138,61 @@ public class OrderDetailActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute( double[] latlng) {
-            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latlng[0], latlng[1]), 17)); //google map 是一個相機從上往下拍,所以來移動相機
+            LatLng storeLocation = new LatLng(latlng[0], latlng[1]);
+
+            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(storeLocation, 17)); //google map 是一個相機從上往下拍,所以來移動相機
+            googleMap.addMarker(new MarkerOptions().position(storeLocation));
+
+            LatLng start = new LatLng(25.0186348, 121.5398379);
+
+            Routing routing = new Routing.Builder()
+                    .travelMode(AbstractRouting.TravelMode.WALKING) //設定走路模式
+                    .waypoints(start, storeLocation) //設定起,訖點 (可以放很多點 經過路徑)
+                    .withListener(new RoutingListener() {
+                        @Override
+                        public void onRoutingFailure(RouteException e) {
+                            // 失敗
+                        }
+
+                        @Override
+                        public void onRoutingStart() {
+
+                        }
+
+                        @Override
+                        public void onRoutingSuccess(ArrayList<Route> routes, int index) {
+                            // 成功
+                            if (polylines != null) {
+                                for (Polyline poly : polylines) {
+                                    poly.remove();
+                                }
+                            }
+
+                            polylines = new ArrayList<>();
+                            //add route(s) to the map.
+                            for (int i = 0; i < routes.size(); i++) { //routes 是很多的路線
+
+                                //In case of more than 5 alternative routes
+
+                                PolylineOptions polyOptions = new PolylineOptions();
+                                polyOptions.color(Color.RED); // 設定顏色
+                                polyOptions.width(10 + i * 3); // 設定寬度
+                                polyOptions.addAll(routes.get(i).getPoints());
+                                Polyline polyline = googleMap.addPolyline(polyOptions); // 將線劃進Google Map裡面
+                                polylines.add(polyline); // polylines多邊的線
+
+//            Toast.makeText(getApplicationContext(),"Route "+ (i+1) +": distance - "+ routes.get(i).getDistanceValue()+": duration - "+ routes.get(i).getDurationValue(),Toast.LENGTH_SHORT).show();
+                            }
+
+                        }
+
+                        @Override
+                        public void onRoutingCancelled() {
+
+                        }
+                    }).build(); //接收回來的工作
+
+            routing.execute();
         }
 
         public GeoCodingTask(GoogleMap googleMap){this.googleMap = googleMap;}
