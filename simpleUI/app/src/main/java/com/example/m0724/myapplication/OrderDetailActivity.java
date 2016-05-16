@@ -10,6 +10,11 @@ import android.os.Bundle;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.LatLng;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
@@ -26,6 +31,8 @@ public class OrderDetailActivity extends AppCompatActivity {
 
     String storeName; //店名
     String address; //地址
+
+    MapFragment mapFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,7 +91,16 @@ public class OrderDetailActivity extends AppCompatActivity {
             }*/
         }
 
-        (new GeoCodingTask(mapImageView)).execute(address);
+
+        mapFragment = (MapFragment)getFragmentManager().findFragmentById(R.id.googleMapFragment);
+
+        // mapFragment只是一個生命週期的activity，真正要的是Callback裡面的 googleMap
+        mapFragment.getMapAsync(new OnMapReadyCallback() {
+            @Override
+            public void onMapReady(GoogleMap googleMap) {
+                (new GeoCodingTask(googleMap)).execute(address);
+            }
+        });
         /*
         for (int i = 0; i < 10; i++) {
             Thread thread = new Thread(new Runnable() {
@@ -98,22 +114,21 @@ public class OrderDetailActivity extends AppCompatActivity {
         }*/
     }
 
-    private static class GeoCodingTask extends AsyncTask<String, Void, Bitmap> {
-        ImageView imageView;
+    private static class GeoCodingTask extends AsyncTask<String, Void, double[]> {
+        GoogleMap googleMap;
         @Override
-        protected Bitmap doInBackground(String... params) {
+        protected double[] doInBackground(String... params) {
             String address = params[0];
             double[] latlng = Utils.addressToLatLng(address);
-            return Utils.getStaticMap(latlng);
+            return latlng;
         }
 
         @Override
-        protected void onPostExecute(Bitmap bitmap) {
-            super.onPostExecute(bitmap);
-            imageView.setImageBitmap(bitmap);
+        protected void onPostExecute( double[] latlng) {
+            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latlng[0], latlng[1]), 17)); //google map 是一個相機從上往下拍,所以來移動相機
         }
 
-        public GeoCodingTask(ImageView imageView){this.imageView = imageView;}
+        public GeoCodingTask(GoogleMap googleMap){this.googleMap = googleMap;}
     }
 
     private static class ImageLoadingTask extends AsyncTask<String, Void, Bitmap> {

@@ -27,8 +27,8 @@
      App Indexing.  See https://g.co/AppIndexing/AndroidStudio for more information.
         -->
         <meta-data
-            android:name="com.google.android.gms.version"
-            android:value="@integer/google_play_services_version" />
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyDOr8LLc6Jj2XmajflBi-4qHhpbtizApSc"/>
 
         <activity android:name=".DrinkMenuActivity" />
         <activity android:name=".OrderDetailActivity"></activity>
