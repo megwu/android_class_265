@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
+import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.ImageView;
@@ -21,6 +22,10 @@ public class OrderDetailActivity extends AppCompatActivity {
     TextView storeInfo;
     TextView menuResults;
     ImageView photo;
+    ImageView mapImageView;
+
+    String storeName; //店名
+    String address; //地址
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,10 +36,16 @@ public class OrderDetailActivity extends AppCompatActivity {
         storeInfo = (TextView)findViewById(R.id.storeInfo);
         menuResults = (TextView)findViewById(R.id.menuResults);
         photo = (ImageView)findViewById(R.id.photoImageView);
+        mapImageView = (ImageView)findViewById(R.id.mapImageView);
 
         Intent intent = getIntent();
         note.setText(intent.getStringExtra("note"));
         storeInfo.setText(intent.getStringExtra("storeInfo"));
+
+        String[] info = intent.getStringExtra("storeInfo").split(",");
+
+        storeName = info[0];
+        address = info[1];
 
         String results = intent.getStringExtra("menuResults") ;
         String text = "";
@@ -53,8 +64,8 @@ public class OrderDetailActivity extends AppCompatActivity {
         if (!"".equals(url)) {
 //            Picasso.with(this).load(intent.getStringExtra("photoURL")).into(photo);
             // 將上一行Picassp mark掉,改用寫的Task試試看
-//            (new ImageLoadingTask(photo)).execute(url);
-            (new GeoCodingTask(photo)).execute("新北市汐止區大同路一段369號");
+            (new ImageLoadingTask(photo)).execute(url);
+//            (new GeoCodingTask(photo)).execute("新北市汐止區大同路一段369號");
 
             // 10萬秒跑10次 測試記憶體爆掉的狀況
             /*for (int i = 0; i < 10; i++) {
@@ -72,6 +83,19 @@ public class OrderDetailActivity extends AppCompatActivity {
                 thread.start();
             }*/
         }
+
+        (new GeoCodingTask(mapImageView)).execute(address);
+        /*
+        for (int i = 0; i < 10; i++) {
+            Thread thread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    while (true) {
+                        SystemClock.sleep(1000);
+                    }
+                }
+            });
+        }*/
     }
 
     private static class GeoCodingTask extends AsyncTask<String, Void, Bitmap> {

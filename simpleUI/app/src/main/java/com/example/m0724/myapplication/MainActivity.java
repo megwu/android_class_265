@@ -341,6 +341,7 @@ public class MainActivity extends AppCompatActivity {
                     return;
                 }
 
+                /* 自己寫的作業
                 Realm realm = Realm.getDefaultInstance();
                 ArrayList dataList = new ArrayList();
 
@@ -351,6 +352,15 @@ public class MainActivity extends AppCompatActivity {
                 realm.close();
 
                 ArrayAdapter<String> adapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_spinner_dropdown_item, dataList);
+                spinner.setAdapter(adapter);
+                */
+                String[] storeInfo = new String[objects.size()];
+                for (int i = 0; i < objects.size(); i++) {
+                    ParseObject object = objects.get(i);
+                    storeInfo[i] = object.getString("name") + "," + object.getString("address");
+                }
+
+                ArrayAdapter<String> adapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_spinner_dropdown_item, storeInfo);
                 spinner.setAdapter(adapter);
             }
         });
