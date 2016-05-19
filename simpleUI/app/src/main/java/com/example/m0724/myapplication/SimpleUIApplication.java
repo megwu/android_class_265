@@ -2,6 +2,8 @@ package com.example.m0724.myapplication;
 
 import android.app.Application;
 
+import com.facebook.FacebookSdk;
+import com.facebook.appevents.AppEventsLogger;
 import com.parse.Parse;
 
 /**
@@ -20,5 +22,7 @@ public class SimpleUIApplication extends Application {
                         .server("https://parseapi.back4app.com/") //Parse API Address
                         .build()
         );
+        FacebookSdk.sdkInitialize(getApplicationContext());
+        AppEventsLogger.activateApp(this);
     }
 }

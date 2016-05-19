@@ -30,11 +30,22 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.facebook.AccessToken;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
+import com.facebook.login.LoginResult;
+import com.facebook.login.widget.LoginButton;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.SaveCallback;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,6 +84,7 @@ public class MainActivity extends AppCompatActivity {
     SharedPreferences.Editor editor;
 
     Realm realm;
+    private CallbackManager callbackManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -239,6 +251,7 @@ public class MainActivity extends AppCompatActivity {
 
         setupListView();
         setupSpinner();
+        setupFaceBook();
 
 
         int selectedId = sp.getInt("spinner", 0);
@@ -257,6 +270,48 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    void setupFaceBook() {
+        callbackManager = CallbackManager.Factory.create();
+        LoginButton loginButton = (LoginButton) findViewById(R.id.loginbutton);
+        if (loginButton != null) {
+            loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+                @Override
+                public void onSuccess(LoginResult loginResult) {
+                    AccessToken accessToken = AccessToken.getCurrentAccessToken();
+                    GraphRequest request = GraphRequest.newGraphPathRequest(accessToken
+                            , "/v2.5/me",
+                            new GraphRequest.Callback() {
+                                @Override
+                                public void onCompleted(GraphResponse response) {
+                                    JSONObject object = response.getJSONObject();
+                                    try {
+                                        String name = object.getString("name");
+                                        Toast.makeText(MainActivity.this, "Hello " + name, Toast.LENGTH_SHORT).show();
+                                        textView.setText("Hello " + name);
+                                        Log.d("debug", object.toString());
+
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            });
+                    request.executeAsync();
+
+                }
+
+                @Override
+                public void onCancel() {
+
+                }
+
+                @Override
+                public void onError(FacebookException error) {
+
+                }
+            });
+        }
     }
 
     // Adapter 是轉換器
@@ -482,6 +537,7 @@ public class MainActivity extends AppCompatActivity {
                 hasPhoto = true;
             }
         }
+        callbackManager.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override
